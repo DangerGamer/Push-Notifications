@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.dm.pushnotifications.databinding.ActivityMainBinding
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -32,7 +33,13 @@ class MainActivity : AppCompatActivity() {
                 getPermission()
             }
         }
+
+        binding.btnNotifyWeb.setOnClickListener{
+            showNotificationWeb()
+        }
     }
+
+
 
     private fun getPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -53,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -67,7 +73,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun showNotification() {
         val intent = Intent(this, MainActivity::class.java)
@@ -86,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
         with(NotificationManagerCompat.from(this)) {
             if (ActivityCompat.checkSelfPermission(
-                    binding.btnNotify.context,
+                    binding.btnNotifyMobile.context,
                     Manifest.permission.POST_NOTIFICATIONS
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
@@ -96,5 +101,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    private fun showNotificationWeb() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                println("🔥 Token FCM: $token")
+            }
+        }
+    }
 }
